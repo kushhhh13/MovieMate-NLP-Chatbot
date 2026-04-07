@@ -112,7 +112,6 @@ MovieMate-NLP-Chatbot/
 ## 🔮 Future Extensions
 
 - Replace TF-IDF with sentence transformers for deeper semantic search
-- Add FAISS vector database for faster search at scale
 - Integrate movie poster display in the chat interface
 - Add user rating and personalisation features
 - Deploy as a permanent web app using Hugging Face Spaces
