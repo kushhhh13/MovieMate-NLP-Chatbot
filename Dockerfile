@@ -11,6 +11,8 @@ COPY config/ ./config/
 COPY manage.py .
 COPY IMDB_Top_1000_Movies.csv .
 
+RUN python manage.py collectstatic --noinput
+
 ENV PYTHONUNBUFFERED=1
 
 # 8000 is used for local development and plain `docker run`. Render (and
@@ -27,4 +29,4 @@ EXPOSE 8000
 # free-tier redeploy). That's an intentional scope cut for a demo project,
 # not an oversight, a real deployment would move to a persistent disk or
 # a hosted Postgres instance instead.
-CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py populate_movies && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py populate_movies && (python manage.py createsuperuser --noinput || true) && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

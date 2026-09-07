@@ -40,10 +40,12 @@ import django  # noqa: E402
 django.setup()
 
 from movies.models import ChatSession, ChatMessage  # noqa: E402
+from config.asgi import application as django_asgi_app  # noqa: E402
 
 from .data_prep import load_and_clean_data
 from .retrieval import MovieRetriever
 from .chatbot import MovieChatBot
+from .gradio_app import build_demo
 
 app = FastAPI(title="MovieMate API", version="0.1.0")
 
@@ -56,7 +58,12 @@ if not os.environ.get("GROQ_API_KEY"):
 _df = load_and_clean_data(os.environ.get("MOVIE_CSV_PATH", "IMDB_Top_1000_Movies.csv"))
 _retriever = MovieRetriever(_df)
 
-# Live, in-process bot instances. Fast path for an ongoing conversation.
+import gradio as gr
+app = gr.mount_gradio_app(app, build_demo(_retriever), path="/ui")
+app.mount("/admin", django_asgi_app)
+
+# Live, in-process bot instances.
+
 _sessions: Dict[str, MovieChatBot] = {}
 
 
@@ -111,6 +118,7 @@ def _persist_turn(session_id: str, user_message: str, bot_reply: str) -> None:
 def root():
     return {
         "message": "MovieMate API is running.",
+        "chat_ui": "/ui",
         "try": [
             "GET /health",
             "POST /chat with JSON body: {\"message\": \"suggest thriller movies after 2000\"}",
