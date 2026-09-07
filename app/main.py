@@ -107,6 +107,18 @@ def _persist_turn(session_id: str, user_message: str, bot_reply: str) -> None:
     ChatMessage.objects.create(session=session, role="bot", message=bot_reply)
 
 
+@app.get("/")
+def root():
+    return {
+        "message": "MovieMate API is running.",
+        "try": [
+            "GET /health",
+            "POST /chat with JSON body: {\"message\": \"suggest thriller movies after 2000\"}",
+        ],
+    }
+
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "movies_loaded": len(_df)}
